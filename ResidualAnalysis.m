@@ -273,9 +273,9 @@ if residuals_figures
     end
   end
 end
-% Save residuals
-save("outputs\\residuals.mat","residuals","Nmin");
 fprintf('Calculations done.\n');
+% Save residuals
+%save("outputs\\residuals.mat","residuals","Nmin");
 
 fileID = fopen(filename_output_csv,'w');
 fprintf(fileID,output_string_csv);

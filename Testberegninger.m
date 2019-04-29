@@ -1,7 +1,5 @@
 % Testberegninger.m
 
-%TODO: Strength plots
-%TODO: Comments
 alpha = 0.05;
 sigma0_all_list = [4.0456 3 5];
 filename_output = 'outputs\\testberegninger.csv';

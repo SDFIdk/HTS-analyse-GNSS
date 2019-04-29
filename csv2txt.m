@@ -1,5 +1,5 @@
 function status = csv2txt(filename_input,filename_output)
-  
+  %Creates txt files that can be accessed by software that Mr. Keller uses.
   
   % Formatstring (change this if the input files get different fields.
   T = "%d %s %f %f %f %*f %*f %*f %*d %s %s %*s";
