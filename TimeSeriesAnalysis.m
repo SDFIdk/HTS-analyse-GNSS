@@ -1,38 +1,46 @@
-%TIMESERIESANALYSIS
+% TIMESERIESANALYSIS
 %
 % Inputs:
 %   filename_input:      csv file with gpsnr, refnr, X,Y,X coordinates and
 %                        YYYYmmdd epoch (see the formatstring 'T' below)
-%   filename_5d_points: (column of four letter gnss stations that are 5d points)
-%   filename_uplifts:   (see readUplifts.m for file specification).
+%						 Note: this must be a comma seperated file with the following columns
+% 						 REFNR,GPSNR,XKOOR,YKOOR,ZKOOR,XRMS,YRMS,ZRMS,JNR_BSIDE,SYS,EPOCH,IN_DATE
+%  						 File must be sorted by REFNR in ascending order.
+%   
+%	filename_5d_points:  column of four letter gnss stations that are 5d points
+%   
+%	filename_uplifts:    see readUplifts.m for file specification
 %
 % Most settings are on/off by using 1 or 0;
 %
 % oldjo@sdfe.dk, November 2017
 %
-% Input Filenames
-% Note: this must be a comma seperated file with the following columns
-% File must be sorted by REFNR in ascending order.
-% REFNR,GPSNR,XKOOR,YKOOR,ZKOOR,XRMS,YRMS,ZRMS,JNR_BSIDE,SYS,EPOCH,IN_DATE
+%%############################################################################ 
+%% INPUT FILENAMES:
+
+%% Data file 
 filename_input = 'inputs\\5D_TS_up_um.csv';
 
-%File identifying the "5D" points:
+%% File identifying the 5D points:
 filename_5d_points = 'inputs\\5d_points_sorted.csv'; 
 
-%File with uplift values from DTU mm/year
+%% File with uplift values from DTU in mm/year
 filename_uplifts = 'inputs\\altgps_uplift';
 
-%Significance level:
+%%############################################################################ 
+%% SIGNIFICANCE LEVEL:
 alpha = 0.05;
 
 %% SIGMA_0_ALL e.g. Pooled Standard Deviation, leave undefined to recalculate.
 %sigma0_all = 4.01401;
 
-%Calculate and output for Easting and Northing too? Set to 0 for Height only
+%%############################################################################ 
+%% CALCULATE AND OUTPUT FOR EASTINGS AND NORTHINGS:
+%% 1 = yes, 0 = only height is calculated
 outputENH = 0; 
 
 %%############################################################################
-%% ExclusionOption:
+%% EXCLUSION OPTION:
 %% Select which data to use
 %%
 %% 1: Use all points with 3 or more measurements
@@ -46,40 +54,66 @@ outputENH = 0;
 %% 4: Only calculate for given GNSS station
 %%
 exclusionOption = 3;
-% (OPTIONAL: When exclusionOption=4, only calculate for this GNSS station)
+
+%% (When exclusionOption=4, only calculate for this GNSS station)
 exclusiveGPSNR = 'FALT';
-min_points = 2; % Min points 2 requires three observations per station.
 
-%Binning
-do_binning = 1; %1: on, 0: off.
-binsize = 14; % Binsize in days
- 
-%%Figures: Choose either figures or strength_figures, can't do both (bug due to octave update).
-figures = 0; % 0 no figures, 1 show, 2 save, 3 show and save
-strength_figures = 0; % Show statistical Strength 
+%%############################################################################
+%% MINIMUM NUMBER OF OBSERVATIONS:
+%% Set the minimum number of observation for station to get included in analysis.
+%% min_points=2 requires three observations per station.
+min_points = 1; 
 
-% IMPORTANT: The two "combine.bat" files in folders "/figures/" and subfolder
-%            "/figures/strengh/" use GhostView
-%            Please edit the path in the .bat files or set below to 0
+%%############################################################################
+%% BINNING:
+%% 1 = on, 0 = off
+do_binning = 1; 
+%% Binsize in days
+binsize = 14; 
+
+%%############################################################################ 
+%% FIGURES: 
+%% Choose either figures or strength_figures (statistical strength), can't do both (bug due to octave update).
+%% 0 = no figures, 1 = show, 2 = save, 3 = show and save
+figures = 2; 
+strength_figures = 0;
+
+%%############################################################################
+%% MISCELLANEOUS SETTINGS: 
+%%
+%% Combining output plots:
+%% IMPORTANT: The two "combine.bat" files in folders "/figures/" and subfolder
+%%            "/figures/strengh/" use GhostView
+%%            Please edit the path in the .bat files or set below to 0
 combine_plots = 0;
 
-%Mark the middle epoch value on plots?
+%% Mark the middle epoch value on plots?
 plot_middle_epoch = 1;
 
-y_limit = 100; % [mm], define the length of the y-axis, set to 0 for auto
+%% [mm], define the length of the y-axis, set to 0 for auto
+y_limit = 100; 
 
-closeFigures = 1; % prevents too many open windows, closes them immidiately (=1)
+%% prevents too many open windows, closes them immidiately (=1)
+closeFigures = 1; 
+
+%% print out the gps week for the observation (=0)
 show_gpsweek = 1;
 
-% Output filenames and locations
+%% Output folder, format and filenames:
+%% Figure format: 'pdf', 'png' etc.
 fig_folder = 'figures\\';
 strength_fig_folder = 'figures\\strength\\';
-figure_format = 'pdf'; %'pdf', 'png' etc. (output format)
+figure_format = 'pdf'; 
 filename_output_csv = 'outputs\\out.csv';
 filename_middle_epoch = 'outputs\\middle_epoch.csv';
 filename_output_ENH = 'outputs\\out_ENH.csv';
 filename_output_H = 'outputs\\out_H.csv';
 
+%%##############################################################################
+%%##############################################################################
+%%
+%%             PROGRAM BEGINS
+%%
 %%##############################################################################
 %%##############################################################################
 
@@ -260,7 +294,7 @@ for i = 1:length(Y);
   end
   num_measurements_binned = length(epochs);
 
-  %This switch controls which GPSNR are evaluatied.
+  %This switch controls which GPSNR are evaluated.
   switch exclusionOption
     case 1
       condition = (num_measurements_binned > min_points);
@@ -355,8 +389,8 @@ for i = 1:length(Y);
 			stats.t_test, stats.z_test_known)];
     end
 
-	  %Make list to print to the output file "middle_epoch.csv"
-    output_middle_epoch = [output_middle_epoch sprintf(formatspec_middle_epoch,...
+	%Make list to print to the output file "middle_epoch.csv"
+	output_middle_epoch = [output_middle_epoch sprintf(formatspec_middle_epoch,...
                          gpsnr{}, refnr, datestr(epochs0,'YYYYmmdd'), X0, Y0, Z0, num_measurements, b(2))];
  
       

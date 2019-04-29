@@ -212,7 +212,7 @@ residuals_m_e = residuals_m_e(~cellfun('isempty',residuals_m_e));
 sigma_0_sqrd_top_m_e = sigma_0_sqrd_top_m_e(~cellfun('isempty',sigma_0_sqrd_top_m_e));
 sigma_0_sqrd_bottom_m_e = sigma_0_sqrd_bottom_m_e(~cellfun('isempty',sigma_0_sqrd_bottom_m_e));
 
-%% Figures TODO: Non-figure related code still in here. :/
+%% Figures
 if residuals_figures
   % For each M
   for i = 0:length(m_vec) 

@@ -11,11 +11,10 @@ function [b, stats] = linreg(t, x, varargin);
   % inputs:
   %   t                       vector with time [decimal years]
   %   x                       vector with heights [mm]
-  %   varargin(1) alpha       TODO: explain
-  %   varargin(2) Beta_0      TODO: explain
-  %   varargin(3) sigma_0_all TODO: explain
-  
-  % TODO: List outputs
+  %   varargin(1) alpha       confidence interval
+  %   varargin(2) Beta_0      DTU slope to compare to
+  %   varargin(3) sigma_0_all all data sigma
+ 
   
   % Default values
   alpha = 0.05; %95% confidence interval
@@ -110,11 +109,12 @@ function [b, stats] = linreg(t, x, varargin);
   % Students t-test
   if abs(stats.t_score) < stats.t_crit
     stats.t_test = 1;
-  else
+  else  
     stats.t_test = 0;
   end
   
   % Calculate confidence interval, tivn is the Student's t distribution
+  % NOTE: Slight confusion if 'tinv' uses the correct fractile. Ask Aslak
   stats.confinterval_estimated = tinv([alpha/2 1-(alpha/2)],N-2)*stats.sigma_B_hat+b(2);
   
   % Generate data for plots
@@ -134,8 +134,8 @@ function [b, stats] = linreg(t, x, varargin);
   % Estimated Covarience matrix SIGMA for the regression coefficients
   stats.SIGMAest = stats.sigma_0^2 .* (V'*eye(length(x))*V)^(-1);
   
-  %TODO: Check this
-  stats.std_unknown = stats.t_crit*stats.sigma_B_hat/1.96;
+  %STD students t
+  stats.std_unknown = stats.t_crit*stats.sigma_B_hat/norminv(1-alpha/2);
 
   % Only do the below if sigma_0_all is defined
   if length(varargin) > 2
