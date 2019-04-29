@@ -16,6 +16,8 @@ function [xout, tout] = binning(x,t,binsize)
 %
 % 21/09/2017 Óli D. Jóhannsson
 
+
+
 num = ones(size(x)); %vector to keep track of number of measurements in bin
 j = 1;
 k = length(t);

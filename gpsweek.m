@@ -1,5 +1,5 @@
 function [out] = gpsweek(date)
- 
+ % Calculates GPSweek from date
   refdate = '20170101';
   refgpsweek = 1930;
   refdatenum = datenum(datevec(refdate,'yyyymmdd'));
