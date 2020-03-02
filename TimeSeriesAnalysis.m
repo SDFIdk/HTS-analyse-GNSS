@@ -1,6 +1,6 @@
 % TIMESERIESANALYSIS
 clear all; close all; clc;
-%pkg install -forge statistics This needs to be installed for some parts to work.
+%pkg install -forge statistics %This needs to be installed for some parts to work.
 % Inputs:
 %   filename_input:      csv file with gpsnr, refnr, X,Y,Z coordinates and
 %                        YYYYmmdd epoch (see the formatstring 'T' below)
