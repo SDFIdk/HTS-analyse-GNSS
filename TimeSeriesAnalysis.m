@@ -58,7 +58,7 @@ outputENH = 0;
 %%
 exclusionOption = 3;
 
-%Only have the waitbar if you process for all stations (not if you exclusively process 1).
+%Only have the waitbar if you process for all stations, instead of exclusively 1.
 if exclusionOption == 4
 %Have waitbar while processing, DoWait = 1: have the waitbar, 0 = don't have the waitbar.
 DoWait = 0; %No waitbar
@@ -122,7 +122,7 @@ filename_output_csv = 'outputs\\out.csv';
 filename_middle_epoch = 'outputs\\middle_epoch.csv';
 filename_output_ENH = 'outputs\\out_ENH.csv';
 filename_output_H = 'outputs\\out_H.csv';
-filename_output_geoidplot = 'outputs\\out_geoidplot.csv'; %geoid output file
+filename_output_geoidplot = 'outputs\\out_geoidplot.csv'; %geoid output fil
 
 %%##############################################################################
 %%##############################################################################
@@ -132,7 +132,7 @@ filename_output_geoidplot = 'outputs\\out_geoidplot.csv'; %geoid output file
 %%##############################################################################
 %%##############################################################################
 
-pkg load statistics %Load statistics package required for some parts to work (if not installed, run 'pkg install -forge statistics')
+pkg load statistics
 
 % Formatstring (change this if the input files get different fields). The '%*' part in front of some of the formats means that the field is ignored in textread.
 T = "%d %s %f %f %f %*f %*f %*f %*d %s %s %*s";
@@ -274,7 +274,7 @@ uplifts = readUplifts(filename_uplifts,GPSNR(I));
 
 %Initialize waitbar
 if DoWait == 1;
-f = waitbar(0,'1','Name','Running script...',...
+f = waitbar(0,'1','Name','Running TimeSeriesAnalysis...',...
     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 
 setappdata(f,'canceling',0);
@@ -285,7 +285,9 @@ StationTimer = tic;
 % For each unique in GPSNR do:
 for i = 1:length(Y);
   %(To find any station in GPSNR, do index = find(strcmp(GPSNR(I), 'TRAN')) for TRAN for example).
-  %Good stations for debugging: i = 65; %AFEN or i = 101; %TRAN
+  %Good stations for debugging:
+  %i = 65; %AFEN 
+  %i = 101; %TRAN
   
   refnr = Y(i);
   gpsnr = GPSNR(I(i));
@@ -350,9 +352,9 @@ for i = 1:length(Y);
       condition = (num_measurements_binned > min_points);
     case 2
       condition = ((is5Dpoint) && (num_measurements_binned > min_points));
-    case 3 %Default option
+    case 3
       condition = ((is5Dpoint && ~isnan(uplifts(i)) && (num_measurements_binned > min_points)));
-    case 4 %Only single, exclusive GPS station
+    case 4
       condition = strcmp(gpsnr{},exclusiveGPSNR);
   end
   if condition
@@ -377,7 +379,7 @@ for i = 1:length(Y);
     %Call linreg function (where most math/statistics is calculated from)
     [b, stats] = linreg(epochs, heights, alpha, uplift, sigma0_all_h);
     
-    %Default:
+    %default:
     if outputENH %if eastings and northings is calculated (1) or only height (0, default)
       [b_easting, stats_easting] = linreg(epochs, eastings, alpha, 0, sigma0_all_e);
       [b_northing, stats_northing] = linreg(epochs, northings, alpha, 0, sigma0_all_n);
@@ -492,19 +494,20 @@ for i = 1:length(Y);
     end
   end
   if ((strength_figures > 0) && condition)
+    %z = abs(b(2)-uplift)/stats.std_known;
     delta = linspace(-5,5,500);
     
     styrke_title_string = [gpsnr{} ', Statistical Power for Z-test at significance ' ...
     'level ' num2str(alpha) ', N = ' num2str(num_measurements) ', N_{binned} = ' ...
     num2str(num_measurements_binned)];
     
+    %fprintf(['delta is ' num2str(delta)]);
     fprintf(['stats.z_crit is ' num2str(stats.z_crit) '\n'])
     fprintf(['stats.std_known is ' num2str(stats.std_known) '\n'])
     fprintf(['alpha is ' num2str(alpha) '\n'])
     
     fig = styrkeFunktionPlot(delta,stats.z_crit,stats.std_known,alpha,...
           styrke_title_string);     
-          
     %Show strength curve figures
     if (strength_figures == 1) || (strength_figures == 3)
       set(fig, 'visible', 'off');
@@ -522,10 +525,13 @@ for i = 1:length(Y);
       close(fig);
     end
   end
-  
+  T_elaps = toc;
+  T_remain = 335 - toc(StationTimer);
+  %Update the waitbar  
   if DoWait == 1;
-  % Update waitbar and message
-    waitbar(i/length(Y),f,sprintf('Evaluating station nr %i (%s) of %i',i, GPSNR{I(i)} ,length(Y)))
+    if (mod(i,10) == 0 || i == 1) %Only update waitbar on every 10th iteration
+    waitbar(i/length(Y),f,sprintf('Evaluating station nr %i (%s) of %i \n Time elapsed : %i sec, Est. time remaining: %i sec',i, GPSNR{I(i)} ,length(Y), round(T_elaps), round(T_remain)))
+    end
   end
   
  end
@@ -537,8 +543,9 @@ for i = 1:length(Y);
   
   fprintf(['\nTimeSeriesAnalysis of all stations completed in '...
             num2str(toc(StationTimer)) ' seconds\n']);
-            %549 seconds with waitbar and 319 seconds without waitbar
-            %Difference in time with waitbar is 230 seconds, or 1.72 times longer to process 
+            %549 seconds with waitbar
+            %319 seconds without waitbar
+            %Difference in time with/without waitbar is 230 seconds, or 1.72 times longer to process 
             
 %Combine pdf files into one (doesn't work right now in Octave, requires Ghostview (now Ghostscript) and some other things)
 if combine_plots > 0
