@@ -1,5 +1,4 @@
 function [b, stats] = linreg(t, x, varargin);
-  
   % Linear regression and student t test for GNNS data
   % Nov 2017, oldjo@sdfe.dk
   %
@@ -105,7 +104,7 @@ function [b, stats] = linreg(t, x, varargin);
   %Critical value of Student's t distribution for two tails.
   stats.t_crit = tinv(1-(alpha)/2,N-2);
   
-  % Calculate a t_score agains either the null hypothesis or a supplied Beta_0  
+  % Calculate a t_score against either the null hypothesis or a supplied Beta_0  
   warning('off')
   stats.t_score = ( (b(2) - Beta_0)*sqrt(N-2) ) / ...
                   sqrt( stats.SSR / sum( (t - mean(t)).^2 ) ); %possible division by zero when df == 0.                
@@ -120,7 +119,7 @@ function [b, stats] = linreg(t, x, varargin);
     stats.t_test = 0;
   end
   
-  % Calculate confidence interval, tivn is the Student's t distribution
+  % Calculate confidence interval, tinv is the Student's t distribution
   stats.confinterval_estimated = tinv([alpha/2 1-(alpha/2)],N-2)*stats.sigma_B_hat+b(2);
   
   % Generate data for plots
