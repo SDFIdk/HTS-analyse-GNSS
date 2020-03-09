@@ -8,7 +8,7 @@ function fig = styrkeFunktionPlot(delta,z,sigma,alpha,titlestring)
   %     titlestring: ex. BALN, Statistical Power for Z-test at significance level 0.05, N = 1, N_{binned} = 1 (defined on line 460, TimeSeriesAnalysis).
   % Formula:
   % 1 - Phi( (z_crit*sigma - delta)/sigma) + Phi( (-z_crit*sigma - delta)/sigma
-  % where phi == normcdf.
+  % where Phi == normcdf.
   %
   %outputs : returns a figure handle (fig) that can be displayed or stored.
   
