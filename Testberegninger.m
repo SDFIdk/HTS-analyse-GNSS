@@ -1,5 +1,5 @@
 % Testberegninger.m
-
+pkg load statistics %Loads the Octave Statistics Package which is required to run norminv for example.
 alpha = 0.05;
 sigma0_all_list = [4.0456 3 5];
 filename_output = 'outputs\\testberegninger.csv';
