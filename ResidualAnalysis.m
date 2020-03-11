@@ -1,7 +1,4 @@
 %RESIDUALANALYSIS
-%
-%
-% 
 % oldjo@sdfe.dk, November 2017
 
 % Filename (Set here if not already specified in calling Script)
@@ -16,7 +13,7 @@ filename_5d_points = 'inputs\\5d_points_sorted.csv';
 filename_output_csv = 'residuals\\residuals.csv';
 resid_fig_folder = 'residuals\\';
 
-% Alpha
+% alpha
 if ~exist('alpha')
   alpha = 0.05;
 else
@@ -28,8 +25,7 @@ do_binning = 1; %1: on, 0: off.
 binsize = 14; % Binsize in days
 
 % Generate figures (0: no, 1: display, 2: save and display).
-residuals_figures = 0;
-numbins = 25; %number of bins in histograms
+residuals_figures = 0; 
 residuals_closeFigures = 0;
 Nmin = 3;
 
@@ -83,11 +79,11 @@ for i = 1:length(Y);
       is5Dpoint = 1;
     end
   end
-  
+
   %% Only use data from points designated in 5d_points file.
   if is5Dpoint
     
-    if i < length(Y)
+    if i < length(Y) %length(Y) = 642
       xkoords = XKOOR(I(i):(I(i+1)-1));
       ykoords = YKOOR(I(i):(I(i+1)-1));
       zkoords = ZKOOR(I(i):(I(i+1)-1));
@@ -95,7 +91,7 @@ for i = 1:length(Y);
       eastings = EASTINGS(I(i):(I(i+1)-1));
       northings = NORTHINGS(I(i):(I(i+1)-1));
       heights = HEIGHTS(I(i):(I(i+1)-1));
-    else
+    else %Robusthed
       xkoords = XKOOR(I(i):end);
       ykoords = YKOOR(I(i):end);
       zkoords = ZKOOR(I(i):end);
@@ -104,8 +100,6 @@ for i = 1:length(Y);
       northings = NORTHINGS(I(i):end);
       heights = HEIGHTS(I(i):end);
     end
-    
-    
     
     %% Convert epoch yyyymmdd to datenums (since Jan 1, zear ZERO)
     epochs = datenum(epochs,'yyyymmdd');
@@ -119,7 +113,7 @@ for i = 1:length(Y);
     eastings = eastings(Ind);
     northings = northings(Ind);
     heights = heights(Ind);
-  
+ 
     %% Binning (see binning.m for details)
     if do_binning
       [eastings, ~] = binning(eastings,epochs,binsize);
@@ -130,9 +124,6 @@ for i = 1:length(Y);
       [zkoords, epochs] = binning(zkoords,epochs,binsize);
     end
     num_measurements_binned = length(epochs);
-    
-    %% Transformation (moved outside loop)
-    %[eastings, northings, heights] = cartesian_to_UTM32Eetrs89(xkoords,ykoords,zkoords);
     
     %Convert from m/day to mm/year
     epochs = epochs./365.25;
@@ -161,27 +152,30 @@ for i = 1:length(Y);
       [bn_custom, statsn_custom] = linreg(epochs, northings, alpha);
       [be_custom, statse_custom] = linreg(epochs, eastings, alpha);
 
-      %Save to total residual vector [mm]
-      residuals_h = [residuals_h; statsh_custom.resid];
+      %Save to total residual vector [mm] (gets residuals from linreg, statsh_custom.resid = stats in linreg with subvariables, as defined above).
+      residuals_h = [residuals_h; statsh_custom.resid]; %residuals_h etc. is initialized but not defined yet (1. 55).
       residuals_n = [residuals_n; statsn_custom.resid];
       residuals_e = [residuals_e; statse_custom.resid];
       
-      %Save to 'm' residual vector
+      %Save to 'm' residual vector (cell)
       residuals_m_h{m} = [residuals_m_h{m} ; statsh_custom.resid];
       residuals_m_n{m} = [residuals_m_n{m} ; statsn_custom.resid];
       residuals_m_e{m} = [residuals_m_e{m} ; statse_custom.resid];
 
-      % For calculating sigma0_all
-      sigma_0_sqrd_top_h = [sigma_0_sqrd_top_h; statsh_custom.sigma_0_sqrd_top];
-      sigma_0_sqrd_bottom_h = [sigma_0_sqrd_bottom_h; statsh_custom.sigma_0_sqrd_bottom];
-      sigma_0_sqrd_top_m_h{m} = [sigma_0_sqrd_top_m_h{m}; statsh_custom.sigma_0_sqrd_top];
+      % For calculating sigma0_all (Pooled Standard Deviation)
+      %Heights;
+      sigma_0_sqrd_top_h = [sigma_0_sqrd_top_h; statsh_custom.sigma_0_sqrd_top]; %Defines top and bottom for each residual vector, 2 each, 4 in total
+      sigma_0_sqrd_bottom_h = [sigma_0_sqrd_bottom_h; statsh_custom.sigma_0_sqrd_bottom]; %stats.sigma_0_sqrd_bottom and top both comes from linreg, and are "The corrected sample standard deviation".
+      sigma_0_sqrd_top_m_h{m} = [sigma_0_sqrd_top_m_h{m}; statsh_custom.sigma_0_sqrd_top]; %It is exactly the same stats values that are read into both.
       sigma_0_sqrd_bottom_m_h{m} = [sigma_0_sqrd_bottom_m_h{m}; statsh_custom.sigma_0_sqrd_bottom];
       
+      %Northings;
       sigma_0_sqrd_top_n = [sigma_0_sqrd_top_n; statsn_custom.sigma_0_sqrd_top];
       sigma_0_sqrd_bottom_n = [sigma_0_sqrd_bottom_n; statsn_custom.sigma_0_sqrd_bottom];
       sigma_0_sqrd_top_m_n{m} = [sigma_0_sqrd_top_m_n{m}; statsn_custom.sigma_0_sqrd_top];
       sigma_0_sqrd_bottom_m_n{m} = [sigma_0_sqrd_bottom_m_n{m}; statsn_custom.sigma_0_sqrd_bottom];
       
+      %Eastings;
       sigma_0_sqrd_top_e = [sigma_0_sqrd_top_e; statse_custom.sigma_0_sqrd_top];
       sigma_0_sqrd_bottom_e = [sigma_0_sqrd_bottom_e; statse_custom.sigma_0_sqrd_bottom];
       sigma_0_sqrd_top_m_e{m} = [sigma_0_sqrd_top_m_e{m}; statse_custom.sigma_0_sqrd_top];
@@ -189,15 +183,23 @@ for i = 1:length(Y);
     end
   end
 end
+%Done with "For each unique in GPSNR do", of the 170 for loop.
 
-%Calcualte sigma0_all
+%Calculate sigma0_all (Pooled standard deviation)
 %sigma0_all = sqrt(sum(sigma_0_sqrd_top)./sum(sigma_0_sqrd_bottom));
 
-sigma0_all_h = sqrt(sum(sigma_0_sqrd_top_h)./sum(sigma_0_sqrd_bottom_h));
+%Standard deviation pooled for each individual station
+sigma0_ind_h = sqrt(sigma_0_sqrd_top_h./sigma_0_sqrd_bottom_h);
+sigma0_ind_n = sqrt(sigma_0_sqrd_top_n./sigma_0_sqrd_bottom_n);
+sigma0_ind_e = sqrt(sigma_0_sqrd_top_e./sigma_0_sqrd_bottom_e);
+
+%This is then the pooled standard deviation for all points, for northings, heights and eastings.
+sigma0_all_h = sqrt(sum(sigma_0_sqrd_top_h)./sum(sigma_0_sqrd_bottom_h)); 
 sigma0_all_n = sqrt(sum(sigma_0_sqrd_top_n)./sum(sigma_0_sqrd_bottom_n));
 sigma0_all_e = sqrt(sum(sigma_0_sqrd_top_e)./sum(sigma_0_sqrd_bottom_e));
 
 m_vec = find(~cellfun('isempty',residuals_m_h));
+numbins = length(m_vec);
 
 %% Remove empty cells
 residuals_m_h = residuals_m_h(~cellfun('isempty',residuals_m_h));
@@ -212,70 +214,30 @@ residuals_m_e = residuals_m_e(~cellfun('isempty',residuals_m_e));
 sigma_0_sqrd_top_m_e = sigma_0_sqrd_top_m_e(~cellfun('isempty',sigma_0_sqrd_top_m_e));
 sigma_0_sqrd_bottom_m_e = sigma_0_sqrd_bottom_m_e(~cellfun('isempty',sigma_0_sqrd_bottom_m_e));
 
-%% Figures
-if residuals_figures
-  % For each M
-  for i = 0:length(m_vec) 
-    fig = figure;%('PaperPositionMode','auto');
-    set(gcf,'PaperType','A4', ...
-         'paperOrientation', 'landscape','PaperPositionMode','auto', ...
-         'paperunits','CENTIMETERS', ...
-         'PaperPosition',[.63, .63, 28.41, 19.72]); 
-    if i == 0
-      [h,binCenters] = hist(residuals,numbins);
-      mu_residuals = mean(residuals);
-      var_residuals = var(residuals);
-      sigma0_m = sigma0_all;
-      titlestring = ['m >= ' num2str(Nmin) " \n"];
-            
-      output_string_csv = [output_string_csv, "all,",...
-                           num2str(mu_residuals),", ",...
-                           num2str(var_residuals), "\n"];
-    else 
-      [h,binCenters] = hist(residuals_m{i},numbins);
-      titlestring = ['m = ' num2str(m_vec(i)) " \n"];
-      mu_residuals = mean(residuals_m{i});
-      var_residuals = var(residuals_m{i});
-      sigma0_m = sqrt(sum(sigma_0_sqrd_top_m{i})./sum(sigma_0_sqrd_bottom_m{i}));
-      
-      output_string_csv = [output_string_csv, int2str(m_vec(i)),", ",...
-                           num2str(mu_residuals),", ",...
-                           num2str(var_residuals),"\n"];
-    end
-
-    %Normalize histogram
-    h = h/(sum(h)); 
-
-    bar(binCenters,h, 'DisplayName', 'Residuals'); 
-    hold on;
-        
-    x = linspace(min(binCenters),max(binCenters),100);
-    y = normpdf(x,mu_residuals,sqrt(var_residuals))*(binCenters(2)-binCenters(1));
-    y2 = normpdf(x,mu_residuals,sigma0_m)*(binCenters(2)-binCenters(1));
-    plot(x,y,'k','linewidth',2);
-    plot(x,y2,'g','linewidth',2);
-
-    titlespec = "\mu = %f5 mm, \sigma = %f5 mm";
-    title([titlestring sprintf(titlespec,mu_residuals,sqrt(var_residuals))]);
-    
-    ylabel('Normalized counts');
-    xlabel('Residual [mm]');
-    if residual_figures == 2
-      if i == 0
-        filename = sprintf('all.%s',figure_format);
-      else
-        filename = sprintf('m%i.%s',m_vec(i),figure_format);
-      end
-      saveas(fig,[resid_fig_folder filename],figure_format)
-      if closeFigures
-        close(fig);
-      end
-    end
-  end
+%By Jonathan, 10-02-2020:
+tic
+% Generates histograms for Heights, Northings and Eastings standard deviations.
+if histcalc == 1
+figure(1)
+bar(sigma0_ind_h)
+title('Height standard deviation histogram')
+xlabel 'Station nr.'
+ylabel 'Standard deviation'
+figure(2)
+bar(sigma0_ind_n)
+title('Northings standard deviation histogram')
+xlabel 'Station nr.'
+ylabel 'Standard deviation'
+figure(3)
+bar(sigma0_ind_e)
+title('Eastings standard deviation histogram')
+xlabel 'Station nr.'
+ylabel 'Standard deviation'
 end
+resT = toc;
+sprintf('Histograms calculated in %i seconds\n',resT)
+
 fprintf('Calculations done.\n');
-% Save residuals
-%save("outputs\\residuals.mat","residuals","Nmin");
 
 fileID = fopen(filename_output_csv,'w');
 fprintf(fileID,output_string_csv);

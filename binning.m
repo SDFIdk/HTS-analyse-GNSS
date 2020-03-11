@@ -16,20 +16,21 @@ function [xout, tout] = binning(x,t,binsize)
 %
 % 21/09/2017 Óli D. Jóhannsson
 
-
-
 num = ones(size(x)); %vector to keep track of number of measurements in bin
 j = 1;
 k = length(t);
+
 while j < k
-  %if the next t value is within 'binsize' days do:
+  %if the next t value is within 'binsize' days (14 days default) do: 
   if t(j+1) <= (t(j) + binsize)
     if (j+2) <= length(t)
       %If there are at least two more elements in 't'
-      x = [x(1:j-1); (num(j)*x(j)+x(j+1))/(num(j)+1); x(j+2:length(x))];
+      x = [x(1:j-1); (num(j)*x(j)+x(j+1))/(num(j)+1); x(j+2:length(x))]; %The current index in 'x' is a kind of mean value.
+      %It is added with the following index and then divided by 2. After this they are put together,
       t = [t(1:j-1); (num(j)*t(j)+t(j+1))/(num(j)+1); t(j+2:length(t))];
+      %Same approach with the time vector t.
       %update weight vector
-      num = [num(1:j-1); (num(j)+num(j+1)) ;num(j+2:length(num))]; 
+      num = [num(1:j-1); (num(j)+num(j+1)) ;num(j+2:length(num))];
     else
       %If j+1 is the last element in 't'
       x = [x(1:j-1); (num(j)*x(j)+x(j+1))/(num(j)+1) ];
@@ -47,3 +48,4 @@ end
 
 xout = x;
 tout = t;
+

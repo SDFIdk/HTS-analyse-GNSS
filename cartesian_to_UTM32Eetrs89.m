@@ -21,5 +21,4 @@ function [X, Y, h] = cartesian_to_UTM32Eetrs89(X,Y,Z)
     X = [X ; str2num(C{i})];
     Y = [Y ; str2num(C{i+1})];
     h = [h ; str2num(C{i+2})];
-  
 end
