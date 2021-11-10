@@ -1,8 +1,8 @@
 %UpliftRMS
 
 % Calculates RMS between fit and uplift model as function of number of 
-% datapoints displays the results.
-% Uses data from out_H.csv
+% datapoints and displays the results in the editor.
+% Uses data from out_H.csv (produce of TimeSeriesAnalysis.m)
 
 %EXAMPLE:
 %

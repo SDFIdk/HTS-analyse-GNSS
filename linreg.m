@@ -1,5 +1,5 @@
 function [b, stats] = linreg(t, x, varargin);
-  % Linear regression and student t test for GNNS data
+  % Linear regression and student t test for GNSS data
   % Nov 2017, oldjo@sdfe.dk
   %
   % outputs:
@@ -39,7 +39,7 @@ function [b, stats] = linreg(t, x, varargin);
   stats.alpha = alpha;
   stats.gamma = 1-alpha; %never used.
   
-  % If inputs are row vectors, turn them into colums vectors:
+  % If inputs are row vectors, turn them into column vectors:
   if size(t,1) < size(t,2)
     t = t';
   end
@@ -56,7 +56,7 @@ function [b, stats] = linreg(t, x, varargin);
   
   N = length(t); % Num of points
   stats.N = N;
-  stats.df = N - 2; % Degrees of freedom (N - (one for slope, one for intercept)
+  stats.df = N - 2; % Degrees of freedom (N - (one for slope, one for intercept))
   
    
   % Residuals
@@ -85,11 +85,11 @@ function [b, stats] = linreg(t, x, varargin);
   % Sum of Squares of Residuals (p.127)
   stats.SSR = sum(resid.^2);
   
-  % Mean Squared Residual (aka. Mean Squered Error) (p.127)
+  % Mean Squared Residual (aka. Mean Squared Error) (p.127)
   MSR = stats.SSR/stats.df;
   stats.MSR = MSR;
   
-  % Estimated Standar Error of Slope, (p.127) Chapter 5: Regression models
+  % Estimated Standard Error of Slope, (p.127) Chapter 5: Regression models
   stats.sigma_B_hat = sqrt((MSR*inv(V'*V))(2,2));
   
   % Equivalent:  

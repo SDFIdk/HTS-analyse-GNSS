@@ -17,7 +17,7 @@
 %
 %%############################################################################ 
 %% INPUT FILENAMES:
-
+clear;clc;
 %% Data file 
 filename_input = 'inputs\\5D_tidsserier_20190820.csv';
 
@@ -25,7 +25,7 @@ filename_input = 'inputs\\5D_tidsserier_20190820.csv';
 filename_5d_points = 'inputs\\5d_points_sorted.csv'; 
 
 %% File with uplift values from DTU in mm/year
-filename_uplifts = 'inputs\\altgps_new_uplift';
+filename_uplifts = 'inputs\\altgps_uplift';
 
 %%############################################################################ 
 %% SIGNIFICANCE LEVEL:
@@ -56,7 +56,7 @@ outputENH = 0;
 exclusionOption = 1;
 
 %% (When exclusionOption=4, only calculate for this GNSS/5D station)
-exclusiveGPSNR = 'KOKI';
+exclusiveGPSNR = 'VAEG';
 
 %%############################################################################
 %% MINIMUM NUMBER OF OBSERVATIONS:
@@ -69,7 +69,7 @@ min_points = 1;
 %% 1 = on, 0 = off
 do_binning = 1; 
 %% Binsize in days
-binsize = 14; 
+binsize = 200; 
 
 %%############################################################################ 
 %% FIGURES: 
@@ -253,7 +253,7 @@ formatspec_middle_epoch = '%s, %i, %s, %.5f, %.5f, %.5f, %i, %.2f\n';
 
 %Read uplifts from file (see readUplifts.m for input file specification)
 uplifts = readUplifts(filename_uplifts,GPSNR(I));
-
+disp(binsize)
 % For each unique in GPSNR do:
 for i = 1:length(Y);
   refnr = Y(i);
@@ -301,9 +301,9 @@ for i = 1:length(Y);
   eastings = eastings(Ind);
   northings = northings(Ind);
   heights = heights(Ind);
- 
+
   %% Binning (see binning.m for details)
-  if do_binning
+  if do_binning == 1
     [eastings, ~] = binning(eastings,epochs,binsize);
     [northings, ~] = binning(northings,epochs,binsize);
     [heights, ~] = binning(heights,epochs,binsize);

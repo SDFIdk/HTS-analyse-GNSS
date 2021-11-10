@@ -3,7 +3,7 @@ function fig = styrkeFunktionPlot(delta,z,sigma,alpha,titlestring)
   % makes a plot of the statistical power and puts 'titlestring'
   % as the title.
   %inputs:
-  %     delta: 
+  %     delta: List of x-values from which a y-value is calculates ([-5,5,500]
   %     z    : 
   %     sigma: 
   %     alpha: significance level

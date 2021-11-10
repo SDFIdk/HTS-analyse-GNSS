@@ -4,9 +4,9 @@
 % 
 % oldjo@sdfe.dk, November 2017
 
-% Filename (Set here if not already specified in calling Script)
+% Filename (Set here if not already specified in calling script)
 if ~exist('filename_input')
-   filename_input = 'inputs\\5D_tidsserier_20180215.csv';
+   filename_input = 'inputs\\5D_tidsserier_20190820.csv';
 end
 % Note: this must be a comma seperated file with the following columns
 % REFNR,GPSNR,XKOOR,YKOOR,ZKOOR,XRMS,YRMS,ZRMS,JNR_BSIDE,SYS,EPOCH,IN_DATE
@@ -24,8 +24,8 @@ else
 end
 
 % Binning (pre binning of observations, see 'binning.m' for the inner workings)
-do_binning = 1; %1: on, 0: off.
-binsize = 14; % Binsize in days
+%do_binning = 1; %1: on, 0: off.
+%binsize = 14; % Binsize in days
 
 % Generate figures (0: no, 1: display, 2: save and display).
 residuals_figures = 0;
@@ -55,7 +55,7 @@ sigma_0_sqrd_bottom_e = [];
 residuals_h = [];
 residuals_n = [];
 residuals_e = [];
-residuals_m_h = cell(1, 1024*1024); %cell to store residuals catagorized by number of observatiosn
+residuals_m_h = cell(1, 1024*1024); %cell to store residuals categorized by number of observations
 residuals_m_n = residuals_m_h;
 residuals_m_e = residuals_m_n;
 sigma_0_sqrd_top_m_h = cell(1, 1024*1024); %... similar to the above...
@@ -281,4 +281,4 @@ fileID = fopen(filename_output_csv,'w');
 fprintf(fileID,output_string_csv);
 fclose(fileID);
 
-fprintf('.CSV File written.\n')
+fprintf('.CSV file written.\n')
